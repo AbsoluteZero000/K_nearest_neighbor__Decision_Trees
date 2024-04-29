@@ -21,18 +21,25 @@ if __name__ == "__main__":
     X_test_norm = (X_test - means) / stds
 
     for k in range(1, 9):
+        correct_predictions = 0
+        total_predictions = len(y_test)
         for i in range(X_test_norm.shape[0]):
             dist = getDistanceFromPoint(X_test_norm.iloc[i], X_train_norm)
             nearest_neighbors = dist.sort_values(ascending=True).head(k).index.tolist()
 
             y_pred = y_train[nearest_neighbors].values
             counter = 0
-            print(y_pred)
             for i in range(y_pred.shape[0]):
                 if y_pred[i] == 0:
                     counter -= 1
                 else:
                     counter += 1
             y_pred = counter > 0
-            
+
+            if int(y_pred) == y_test.iloc[i]:
+                correct_predictions += 1
+
             print(f"Actual: {y_test.iloc[i]}, Predicted (K={k}): {int(y_pred)}")
+
+        accuracy = (correct_predictions / total_predictions) * 100
+        print(f"Accuracy (K={k}): {accuracy:.2f}%")
