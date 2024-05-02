@@ -22,7 +22,7 @@ if __name__ == "__main__":
     X_train_norm = (X_train - means) / stds
     X_test_norm = (X_test - means) / stds
 
-    def KNN(X_train, y_train, X_test, k=3):
+    def KNN(X_train, y_train, X_test, k=1):
         predictions = []
         for test_point in X_test.values:
             distances = []
@@ -30,8 +30,10 @@ if __name__ == "__main__":
                 dist = euclidean_distance(test_point, train_point)
                 distances.append(dist)
             
-            nearest_indices = np.argsort(distances)[:k]
+            sorted_distances = sorted(distances)  # Sort the distances
+            print("Sorted distances:", sorted_distances)
             
+            nearest_indices = np.argsort(distances)[:k]
             nearest_labels = [y_train.iloc[i] for i in nearest_indices]
             
             label_counts = Counter(nearest_labels)
@@ -40,7 +42,7 @@ if __name__ == "__main__":
         
         return predictions
 
-    k = 5
+    k = 1
     y_pred = KNN(X_train_norm, y_train, X_test_norm, k)
 
     accuracy = accuracy_score(y_test, y_pred)

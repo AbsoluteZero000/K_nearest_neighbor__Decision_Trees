@@ -1,8 +1,8 @@
-import pandas as pd # type: ignore
-import numpy as np # type: ignore
-from sklearn.model_selection import train_test_split # type: ignore
-from sklearn.metrics import accuracy_score # type: ignore
-import matplotlib.pyplot as plt # type: ignore
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+import matplotlib.pyplot as plt
 
 def mean(df):
     # Calculate the mean for each column in the DataFrame
@@ -22,8 +22,8 @@ def standard_deviation(df):
         std_values[column] = column_std
     return std_values
 
-def getDistanceFromPoint(point, data):
-    return ((point - data) ** 2).sum(axis=1) ** 0.5
+def euclidean_distance(point1, point2):
+    return np.sqrt(np.sum((point1 - point2) ** 2))
 
 def custom_shuffle(indices):
     n = len(indices)
@@ -56,8 +56,6 @@ def t_t_s(X, y, test_size=0.3, random_state=None):
 
     return X_train, X_test, y_train, y_test
 
-
-
 if __name__ == "__main__":
 
     data = pd.read_csv("BankNote_Authentication.csv")
@@ -76,21 +74,14 @@ if __name__ == "__main__":
         total_predictions = len(y_test)
         print(total_predictions)
         for i in range(X_test_norm.shape[0]):
-            dist = getDistanceFromPoint(X_test_norm.iloc[i], X_train_norm)
-            nearest_neighbors = dist.sort_values(ascending=True).head(k).index.tolist()
-            y_pred = y_train[nearest_neighbors].values
-            counter = 0
-            for i in range(y_pred.shape[0]):
-                if y_pred[i] == 0:
-                    counter -= 1
-                else:
-                    counter += 1
-            y_pred = counter > 0
-
-            if int(y_pred) == y_test.iloc[i]:
+            distances = [euclidean_distance(X_test_norm.iloc[i], X_train_norm.iloc[j]) for j in range(X_train_norm.shape[0])]
+            nearest_neighbors = np.argsort(distances)[:k]
+            y_pred = y_train.iloc[nearest_neighbors]
+            prediction = y_pred.value_counts().idxmax()
+            if prediction == y_test.iloc[i]:
                 correct_predictions += 1
 
-            print(f"Actual: {y_test.iloc[i]}, Predicted (K={k}): {int(y_pred)}")
+            print(f"Actual: {y_test.iloc[i]}, Predicted (K={k}): {prediction}")
 
         accuracy = (correct_predictions / total_predictions) * 100
         print(f"Accuracy (K={k}): {accuracy:.2f}%")
