@@ -57,7 +57,23 @@ def t_t_s(X, y, test_size=0.3, random_state=None):
     return X_train, X_test, y_train, y_test
 
 
+def knn(X_train, y_train, X_test, k):
+    predictions = []
 
+    for test_instance in X_test.values:
+        distances = []
+
+        for train_instance in X_train.values:
+            dist = getDistanceFromPoint(test_instance, train_instance)
+            
+            distances.append(dist)
+
+        nearest_indices = np.argsort(distances)[:k]
+        nearest_labels = y_train.iloc[nearest_indices]
+        predicted_label = nearest_labels.mode()[0]
+        predictions.append(predicted_label)
+
+    return predictions
 if __name__ == "__main__":
 
     data = pd.read_csv("BankNote_Authentication.csv")
@@ -71,20 +87,14 @@ if __name__ == "__main__":
     X_train_norm = (X_train - means) / stds
     X_test_norm = (X_test - means) / stds
 
-    for k in range(1, 9):
-        correct_predictions = 0
+    for k in range(1, 10):  # k=1 to k=9
+        predictions = knn(X_train_norm, y_train, X_test_norm, k)
+        correct_predictions = accuracy_score(y_test, predictions, normalize=False)
         total_predictions = len(y_test)
-        print(total_predictions)
-        for i in range(X_test_norm.shape[0]):
-            distances = [getDistanceFromPoint(X_test_norm.iloc[i], X_train_norm.iloc[j]) for j in range(X_train_norm.shape[0])]
-            nearest_neighbors = np.argsort(distances)[:k]
-            y_pred = y_train.iloc[nearest_neighbors]
-            prediction = y_pred.value_counts().idxmax()
-            if prediction == y_test.iloc[i]:
-                correct_predictions += 1
 
-            print(f"Actual: {y_test.iloc[i]}, Predicted (K={k}): {prediction}")
-            
-        print(f"number of correct predictions: {correct_predictions}")
+        print(f"K = {k}")
+        print(f"Number of correctly classified test instances: {correct_predictions}")
+        print(f"Total number of instances in the test set: {total_predictions}")
         accuracy = (correct_predictions / total_predictions) * 100
-        print(f"Accuracy (K={k}): {accuracy:.2f}%")
+        print(f"Accuracy: {accuracy:.2f}%")
+        print()
