@@ -1,6 +1,5 @@
 import pandas as pd # type: ignore
 import numpy as np # type: ignore
-from sklearn.model_selection import train_test_split # type: ignore
 from sklearn.metrics import accuracy_score # type: ignore
 import matplotlib.pyplot as plt # type: ignore
 
@@ -65,7 +64,6 @@ def knn(X_train, y_train, X_test, k):
 
         for train_instance in X_train.values:
             dist = getDistanceFromPoint(test_instance, train_instance)
-            
             distances.append(dist)
 
         nearest_indices = np.argsort(distances)[:k]
@@ -74,6 +72,7 @@ def knn(X_train, y_train, X_test, k):
         predictions.append(predicted_label)
 
     return predictions
+
 if __name__ == "__main__":
 
     data = pd.read_csv("BankNote_Authentication.csv")
@@ -87,7 +86,7 @@ if __name__ == "__main__":
     X_train_norm = (X_train - means) / stds
     X_test_norm = (X_test - means) / stds
 
-    for k in range(1, 10):  # k=1 to k=9
+    for k in range(1, 10):
         predictions = knn(X_train_norm, y_train, X_test_norm, k)
         correct_predictions = accuracy_score(y_test, predictions, normalize=False)
         total_predictions = len(y_test)
