@@ -84,6 +84,7 @@ if __name__ == "__main__":
                 correct_predictions += 1
 
             print(f"Actual: {y_test.iloc[i]}, Predicted (K={k}): {prediction}")
-
+            
+        print(f"number of correct predictions: {correct_predictions}")
         accuracy = (correct_predictions / total_predictions) * 100
         print(f"Accuracy (K={k}): {accuracy:.2f}%")
